@@ -1,9 +1,11 @@
+from random import randint
+
 import pytest
 from assertpy import assert_that
 
-from data import IngredientData
-from praktikum.ingredient import Ingredient
-from praktikum.ingredient_types import INGREDIENT_TYPE_SAUCE, INGREDIENT_TYPE_FILLING
+from praktikum import Ingredient
+from praktikum import INGREDIENT_TYPE_SAUCE, INGREDIENT_TYPE_FILLING
+from utils import generate_random_string
 
 
 class TestIngredient:
@@ -17,8 +19,8 @@ class TestIngredient:
     def test_create_ingredient(self, ingredient_type):
         ingredient = Ingredient(
             ingredient_type=ingredient_type,
-            name=IngredientData.name,
-            price=IngredientData.price,
+            name=generate_random_string(10),
+            price=randint(100, 500),
         )
         description = "Ингредиент создан неверно"
         assert_that(ingredient, description=description).is_type_of(Ingredient)
@@ -26,12 +28,17 @@ class TestIngredient:
         assert_that(ingredient.get_type(), description=description).is_equal_to(ingredient_type)
 
     @pytest.mark.parametrize(
-        "method_name, expected_result", [
-            ("get_name", IngredientData.name),
-            ("get_price", IngredientData.price),
+        "getter_method, expected_result", [
+            ("get_name", "name"),
+            ("get_price", "price"),
         ]
     )
-    def test_getters(self, ingredient, method_name, expected_result):
-        actual_result = getattr(ingredient, method_name)()
-        description = f'Метод "{method_name}" Ингредиента вернул неверные данные'
+    def test_getters(self, ingredients, getter_method, expected_result):
+        ingredient = ingredients(number=1)[0]
+
+        expected_result = getattr(ingredient.ingredient_data, expected_result)
+        getter_method = getattr(ingredient.ingredient, getter_method)
+        actual_result = getter_method()
+
+        description = f'Метод "{getter_method}" Ингредиента вернул неверные данные'
         assert_that(expected_result, description=description).is_equal_to(actual_result)

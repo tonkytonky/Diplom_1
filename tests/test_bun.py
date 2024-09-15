@@ -2,7 +2,7 @@ import pytest
 from assertpy import assert_that
 
 from data import BunData
-from praktikum.bun import Bun
+from praktikum import Bun
 
 
 class TestBun:
